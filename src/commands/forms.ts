@@ -1,6 +1,7 @@
 import { Command } from "@cliffy/command"
 import { Checkbox, Input, Secret, Select, Toggle } from "@cliffy/prompt"
 import outdent from "@cspotcode/outdent"
+import { Spinner } from "@std/cli/unstable-spinner"
 import { blue, bold, brightGreen, brightRed, green } from "@std/fmt/colors"
 
 const loginCommand = new Command()
@@ -8,12 +9,17 @@ const loginCommand = new Command()
   .description("Login with your credentials.")
   .action(async () => {
     const username = await Input.prompt("Username")
-    const password = await Secret.prompt("Password")
-    await Toggle.prompt("Stay logged in?")
-    console.log("\nLogging you in...")
+    const password = await Secret.prompt({
+      message: "Password",
+      hint: "Remember to use a strong password!",
+    })
+    await Toggle.prompt({ message: "Stay logged in?", default: false })
+    console.log()
+    const spinner = new Spinner({ message: "Logging you in...", color: "blue" })
+    spinner.start()
     await new Promise((r) => setTimeout(r, 2000))
+    spinner.stop()
     console.log(outdent`
-
     ${green("✓")} ${bold("Success!")}
 
       Your credentials are:
